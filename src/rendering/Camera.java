@@ -7,6 +7,14 @@ public class Camera {
 	private final Vector3f position;
 	private final Vector3f rotation;
 	
+	public boolean goUp;
+	public boolean goDown;
+	public boolean goLeft;
+	public boolean goRight;
+	public boolean goFront;
+	public boolean goBack;
+	
+	
 	public Camera() {
 		this.position = new Vector3f(0, 0, 0);
 		this.rotation = new Vector3f(0, 0, 0);

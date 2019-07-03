@@ -1,6 +1,7 @@
 package rendering;
 
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -11,14 +12,18 @@ public class Mesh {
 	
 	private final int vaoId;
 	private final int vboId;
+	private final int veoId;
 	private final int vertexCount;
 	
-	public Mesh(float[] positions) {
+	public Mesh(float[] positions, int[] indices) {
 		FloatBuffer buffer = null;
+		IntBuffer intBuffer = null;
 		try {
 			buffer = MemoryUtil.memAllocFloat(positions.length);
-			this.vertexCount = positions.length / 3;
+			intBuffer = MemoryUtil.memAllocInt(indices.length);
+			this.vertexCount = indices.length;
 			buffer.put(positions).flip();
+			intBuffer.put(indices).flip();
 			
 			vaoId = GL30.glGenVertexArrays();
 			GL30.glBindVertexArray(vaoId);
@@ -29,10 +34,17 @@ public class Mesh {
 			GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
 			GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
 			
+			veoId = GL20.glGenBuffers();
+			GL20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, veoId);
+			GL20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, indices, GL20.GL_STATIC_DRAW);
+			
 			GL30.glBindVertexArray(0);
 		} finally {
 			if (buffer != null) {
 				MemoryUtil.memFree(buffer);
+			}
+			if (intBuffer != null) {
+				MemoryUtil.memFree(intBuffer);
 			}
 		}
 	}
@@ -40,7 +52,7 @@ public class Mesh {
 	public void render() {
 		GL30.glBindVertexArray(vaoId);
 		GL30.glEnableVertexAttribArray(0);
-		GL30.glDrawArrays(GL11.GL_TRIANGLES, 0, this.vertexCount);
+		GL30.glDrawElements(GL11.GL_TRIANGLES, this.vertexCount, GL11.GL_UNSIGNED_INT, 0);
 		GL30.glDisableVertexAttribArray(0);
 		GL30.glBindVertexArray(0);
 	}
@@ -58,6 +70,7 @@ public class Mesh {
 
         GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
         GL20.glDeleteBuffers(vboId);
+        GL20.glDeleteBuffers(veoId);
 
         // Delete the VAO
         GL30.glBindVertexArray(0);
