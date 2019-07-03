@@ -3,6 +3,7 @@ package core;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import core.world.GameItem;
 import rendering.Camera;
 
 public class Transformation {

@@ -1,4 +1,4 @@
-package core;
+package core.world;
 
 import org.joml.Vector3f;
 

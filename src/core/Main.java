@@ -1,16 +1,19 @@
 package core;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 
+import core.input.MouseInput;
 import core.model.CubeFactory;
+import core.world.GameItem;
 import rendering.Camera;
 import rendering.Mesh;
 import rendering.Window;
@@ -34,7 +37,18 @@ public class Main {
 		shader.createUniform("projection_matrix");
 		shader.unbind();
 		
-		Mesh cubeMesh = new Mesh(CubeFactory.getVertices(), CubeFactory.getIndices());
+		float[] colors = new float[] {
+				1.0f, 0.0f, 0.0f,
+				0.5f, 0.0f, 0.0f,
+				0.0f, 1.0f, 0.0f,
+				0.0f, 0.5f, 0.0f,
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 0.5f,
+				1.0f, 1.0f, 0.0f,
+				0.0f, 1.0f, 1.0f
+		};
+		
+		Mesh cubeMesh = new Mesh(CubeFactory.getVertices(), colors, CubeFactory.getIndices());
 		
 		GameItem cube1 = new GameItem(cubeMesh);
 		GameItem cube2 = new GameItem(cubeMesh);
@@ -47,6 +61,8 @@ public class Main {
 		List<GameItem> items = new ArrayList<GameItem>();
 		items.add(cube1); items.add(cube2); items.add(cube3);
 		
+		MouseInput mouse = new MouseInput();
+		mouse.init(window.getWindow());
 		Camera cam = new Camera();
 		cam.setPosition(0.0f, 0.0f, 10.0f);
 		
@@ -80,6 +96,7 @@ public class Main {
 			if (cam.goRight) cam.movePosition(moveSpeed, 0.0f, 0.0f);
 			if (cam.goUp) cam.movePosition(0.0f, moveSpeed, 0.0f);
 			if (cam.goDown) cam.movePosition(0.0f, -moveSpeed, 0.0f);
+			
 		};
 		
 		GLFWKeyCallbackI input = (inputWindow, key, scancode, action, mods) -> {
@@ -116,6 +133,8 @@ public class Main {
 					cam.goDown = false; break;
 				}
 			}
+			
+			mouse.input();
 		};
 		
 		window.loop(render, update, input);

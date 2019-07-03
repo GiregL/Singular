@@ -12,10 +12,11 @@ public class Mesh {
 	
 	private final int vaoId;
 	private final int vboId;
+	private final int colorVboId;
 	private final int veoId;
 	private final int vertexCount;
 	
-	public Mesh(float[] positions, int[] indices) {
+	public Mesh(float[] positions, float[] colors, int[] indices) {
 		FloatBuffer buffer = null;
 		IntBuffer intBuffer = null;
 		try {
@@ -30,13 +31,22 @@ public class Mesh {
 			
 			vboId = GL20.glGenBuffers();
 			GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, vboId);
-			GL20.glBufferData(GL20.GL_ARRAY_BUFFER, positions, GL20.GL_STATIC_DRAW);
+			GL20.glBufferData(GL20.GL_ARRAY_BUFFER, buffer, GL20.GL_STATIC_DRAW);
 			GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+			GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
+			
+			buffer.clear();
+			buffer.put(colors).flip();
+			
+			colorVboId = GL30.glGenVertexArrays();
+			GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, colorVboId);
+			GL20.glBufferData(GL20.GL_ARRAY_BUFFER, buffer, GL20.GL_STATIC_DRAW);
+			GL20.glVertexAttribPointer(1, 3, GL11.GL_FLOAT, false, 0, 0);
 			GL20.glBindBuffer(GL20.GL_ARRAY_BUFFER, 0);
 			
 			veoId = GL20.glGenBuffers();
 			GL20.glBindBuffer(GL20.GL_ELEMENT_ARRAY_BUFFER, veoId);
-			GL20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, indices, GL20.GL_STATIC_DRAW);
+			GL20.glBufferData(GL20.GL_ELEMENT_ARRAY_BUFFER, intBuffer, GL20.GL_STATIC_DRAW);
 			
 			GL30.glBindVertexArray(0);
 		} finally {
@@ -52,8 +62,10 @@ public class Mesh {
 	public void render() {
 		GL30.glBindVertexArray(vaoId);
 		GL30.glEnableVertexAttribArray(0);
+		GL30.glEnableVertexAttribArray(1);
 		GL30.glDrawElements(GL11.GL_TRIANGLES, this.vertexCount, GL11.GL_UNSIGNED_INT, 0);
 		GL30.glDisableVertexAttribArray(0);
+		GL30.glDisableVertexAttribArray(1);
 		GL30.glBindVertexArray(0);
 	}
 	
