@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 
-import core.input.MouseInput;
 import core.model.CubeFactory;
 import core.world.GameItem;
 import rendering.Camera;
@@ -61,14 +58,14 @@ public class Main {
 		List<GameItem> items = new ArrayList<GameItem>();
 		items.add(cube1); items.add(cube2); items.add(cube3);
 		
-		MouseInput mouse = new MouseInput();
-		mouse.init(window.getWindow());
 		Camera cam = new Camera();
+		cam.init(window.getWindow());
 		cam.setPosition(0.0f, 0.0f, 10.0f);
 		
 		Transformation transformation = new Transformation();
 		
-		final float moveSpeed = 0.1f;
+		cam.dir = CameraDirection.NULL;
+		
 		
 		ParameterFunction render = () -> {
 			
@@ -90,51 +87,43 @@ public class Main {
 		};
 		
 		ParameterFunction update = () -> {
-			if (cam.goFront) cam.movePosition(0.0f, 0.0f, -moveSpeed);
-			if (cam.goBack) cam.movePosition(0.0f, 0.0f, moveSpeed);
-			if (cam.goLeft) cam.movePosition(-moveSpeed, 0.0f, 0.0f);
-			if (cam.goRight) cam.movePosition(moveSpeed, 0.0f, 0.0f);
-			if (cam.goUp) cam.movePosition(0.0f, moveSpeed, 0.0f);
-			if (cam.goDown) cam.movePosition(0.0f, -moveSpeed, 0.0f);
-			
+			cam.processInput();
 		};
 		
 		GLFWKeyCallbackI input = (inputWindow, key, scancode, action, mods) -> {
 			if (action == GLFW.GLFW_PRESS) {
 				switch (key) {
 				case GLFW.GLFW_KEY_W:
-					cam.goFront = true; break;
+					cam.dir = CameraDirection.FRONT; break;
 				case GLFW.GLFW_KEY_A:
-					cam.goLeft = true; break;
+					cam.dir = CameraDirection.LEFT; break;
 				case GLFW.GLFW_KEY_S:
-					cam.goBack = true; break;
+					cam.dir = CameraDirection.BACK; break;
 				case GLFW.GLFW_KEY_D:
-					cam.goRight = true; break;
+					cam.dir = CameraDirection.RIGHT; break;
 				case GLFW.GLFW_KEY_SPACE:
-					cam.goUp = true; break;
+					cam.dir = CameraDirection.UP; break;
 				case GLFW.GLFW_KEY_LEFT_SHIFT:
-					cam.goDown = true; break;
+					cam.dir = CameraDirection.DOWN; break;
 				}
 			} else if (action == GLFW.GLFW_RELEASE) {
 				switch (key) {
 				case GLFW_KEY_ESCAPE:
 					GLFW.glfwSetWindowShouldClose(window.getWindow(), true); break;
 				case GLFW.GLFW_KEY_W:
-					cam.goFront = false; break;
+					cam.dir = CameraDirection.NULL; break;
 				case GLFW.GLFW_KEY_A:
-					cam.goLeft = false; break;
+					cam.dir = CameraDirection.NULL; break;
 				case GLFW.GLFW_KEY_S:
-					cam.goBack = false; break;
+					cam.dir = CameraDirection.NULL; break;
 				case GLFW.GLFW_KEY_D:
-					cam.goRight = false; break;
+					cam.dir = CameraDirection.NULL; break;
 				case GLFW.GLFW_KEY_SPACE:
-					cam.goUp = false; break;
+					cam.dir = CameraDirection.NULL; break;
 				case GLFW.GLFW_KEY_LEFT_SHIFT:
-					cam.goDown = false; break;
+					cam.dir = CameraDirection.NULL; break;
 				}
 			}
-			
-			mouse.input();
 		};
 		
 		window.loop(render, update, input);

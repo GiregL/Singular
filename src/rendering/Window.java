@@ -27,6 +27,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.nio.IntBuffer;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallbackI;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -41,8 +42,14 @@ public class Window {
 	
 	private long window;
 	
+	public static int WIDTH;
+	public static int HEIGHT;
+	
 	public Window(String name, int width, int height) {
 		LoggerFactory.createInfoLog("Creating Window " + name + " with width: " + width + ", height: " + height);
+		
+		WIDTH = width;
+		HEIGHT = height;
 		
 		GLFWErrorCallback.createPrint(System.err).set();
 		
@@ -83,6 +90,7 @@ public class Window {
 		glfwSwapInterval(1); // vsync
 		
 		glfwShowWindow(window);
+		GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 		
 		// Settings
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
