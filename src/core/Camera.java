@@ -3,6 +3,8 @@ package core;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import rendering.Window;
+
 public class Camera {
 	
 	private Vector3f position = new Vector3f(0, 0, 0);
@@ -22,13 +24,15 @@ public class Camera {
 	
 	public void mouseInput(long window) {
 		GLFW.glfwSetCursorPosCallback(window, (windowHandle, xpos, ypos) -> {
-			xOffset = (float) xpos - lastX;
-			yOffset = (float) ypos - lastY;
-			calculateYaw(xOffset);
-			calculatePitch(yOffset);
-			
-			lastX = (float) xpos;
-			lastY = (float) ypos;
+			if (Window.FOCUSED) {
+				xOffset = (float) xpos - lastX;
+				yOffset = (float) ypos - lastY;
+				calculateYaw(xOffset);
+				calculatePitch(yOffset);
+				
+				lastX = (float) xpos;
+				lastY = (float) ypos;				
+			}
 		});
 	}
 	

@@ -12,9 +12,9 @@ public class GameItem {
 	private float scale;
 	private final Vector3f rotation;
 	
-	public GameItem(Mesh mesh) {
+	public GameItem(Vector3f position, Mesh mesh) {
 		this.mesh = mesh;
-		position = new Vector3f(0, 0, 0);
+		this.position = position;
 		rotation = new Vector3f(0, 0, 0);
 		scale = 1.0f;
 	}

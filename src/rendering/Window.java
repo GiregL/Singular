@@ -42,6 +42,8 @@ public class Window {
 	
 	private long window;
 	
+	public static boolean FOCUSED = false;
+	
 	public static int WIDTH;
 	public static int HEIGHT;
 	
@@ -64,6 +66,13 @@ public class Window {
 		
 		this.window = glfwCreateWindow(width, height, name, NULL, NULL);
 		
+		GLFW.glfwSetMouseButtonCallback(window, (window, button, action, mods) -> {
+			if (button == GLFW.GLFW_MOUSE_BUTTON_1 && action == GLFW.GLFW_PRESS && !FOCUSED) {
+				GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
+				FOCUSED = true;
+			}
+				
+		});
 		
 		if (window == NULL) {
 			LoggerFactory.createErrorLog("Failed to create window");
@@ -91,7 +100,6 @@ public class Window {
 		glfwSwapInterval(1); // vsync
 		
 		glfwShowWindow(window);
-		GLFW.glfwSetInputMode(window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 		
 		// Settings
 		GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -124,5 +132,12 @@ public class Window {
 			
 		}
 	}
-	
+
+	public boolean isFocused() {
+		return FOCUSED;
+	}
+
+	public void setFocused(boolean isFocused) {
+		FOCUSED = isFocused;
+	}
 }
