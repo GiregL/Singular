@@ -1,5 +1,6 @@
 package core.world;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import rendering.Mesh;
@@ -48,6 +49,16 @@ public class GameItem {
 	
 	public Mesh getMesh() {
 		return mesh;
+	}
+	
+	public Matrix4f getModelMatrix() {
+		Matrix4f result = new Matrix4f();
+		result.identity();
+		result.rotate(rotation.x, new Vector3f(0, 1, 0));
+		result.rotate(rotation.y, new Vector3f(1, 0, 0));
+		result.rotate(rotation.z, new Vector3f(0, 0, 1));
+		result.translate(position);
+		return result;
 	}
 	
 }

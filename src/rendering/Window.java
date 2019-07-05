@@ -64,6 +64,7 @@ public class Window {
 		
 		this.window = glfwCreateWindow(width, height, name, NULL, NULL);
 		
+		
 		if (window == NULL) {
 			LoggerFactory.createErrorLog("Failed to create window");
 			System.exit(1);
@@ -79,8 +80,8 @@ public class Window {
 			
 			glfwSetWindowPos(
 					window,
-					(vidMode.width() - pWidth.get(0)),
-					(vidMode.height() - pHeight.get(0)));
+					(vidMode.width() - pWidth.get(0)) / 2,
+					(vidMode.height() - pHeight.get(0)) / 2);
 		}
 		
 		glfwMakeContextCurrent(this.window);

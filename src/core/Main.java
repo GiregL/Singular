@@ -11,7 +11,7 @@ import org.lwjgl.glfw.GLFWKeyCallbackI;
 
 import core.model.CubeFactory;
 import core.world.GameItem;
-import rendering.Camera;
+import core.Camera;
 import rendering.Mesh;
 import rendering.Window;
 import rendering.shaders.ShaderProgram;
@@ -30,7 +30,8 @@ public class Main {
 		shader.link();
 		
 		shader.bind();
-		shader.createUniform("modelview_matrix");
+		shader.createUniform("view_matrix");
+		shader.createUniform("model_matrix");
 		shader.createUniform("projection_matrix");
 		shader.unbind();
 		
@@ -59,71 +60,42 @@ public class Main {
 		items.add(cube1); items.add(cube2); items.add(cube3);
 		
 		Camera cam = new Camera();
-		cam.init(window.getWindow());
-		cam.setPosition(0.0f, 0.0f, 10.0f);
+		cam.mouseInput(window.getWindow());
 		
 		Transformation transformation = new Transformation();
 		
-		cam.dir = CameraDirection.NULL;
-		
-		
 		ParameterFunction render = () -> {
-			
 			Matrix4f projectionMatrix = transformation.getProjectionMatrix(70.0f, 1080, 720, 0.1f, 1000.0f);
 			Matrix4f viewMatrix = transformation.getViewMatrix(cam);
 			
+			
 			for (GameItem item : items) {
-				Matrix4f modelViewMatrix = transformation.getModelViewMatrix(item, viewMatrix);
+				
+				Matrix4f modelMatrix = item.getModelMatrix();
 				
 				shader.bind();
 				
-				shader.setUniform("modelview_matrix", modelViewMatrix);
+				shader.setUniform("model_matrix", modelMatrix);
+				shader.setUniform("view_matrix", viewMatrix);
 				shader.setUniform("projection_matrix", projectionMatrix);
 				
 				item.getMesh().render();
 				
-				shader.unbind();
+				shader.unbind();			
 			}
 		};
 		
 		ParameterFunction update = () -> {
-			cam.processInput();
+				cam.update();
 		};
 		
 		GLFWKeyCallbackI input = (inputWindow, key, scancode, action, mods) -> {
-			if (action == GLFW.GLFW_PRESS) {
-				switch (key) {
-				case GLFW.GLFW_KEY_W:
-					cam.dir = CameraDirection.FRONT; break;
-				case GLFW.GLFW_KEY_A:
-					cam.dir = CameraDirection.LEFT; break;
-				case GLFW.GLFW_KEY_S:
-					cam.dir = CameraDirection.BACK; break;
-				case GLFW.GLFW_KEY_D:
-					cam.dir = CameraDirection.RIGHT; break;
-				case GLFW.GLFW_KEY_SPACE:
-					cam.dir = CameraDirection.UP; break;
-				case GLFW.GLFW_KEY_LEFT_SHIFT:
-					cam.dir = CameraDirection.DOWN; break;
-				}
-			} else if (action == GLFW.GLFW_RELEASE) {
-				switch (key) {
-				case GLFW_KEY_ESCAPE:
-					GLFW.glfwSetWindowShouldClose(window.getWindow(), true); break;
-				case GLFW.GLFW_KEY_W:
-					cam.dir = CameraDirection.NULL; break;
-				case GLFW.GLFW_KEY_A:
-					cam.dir = CameraDirection.NULL; break;
-				case GLFW.GLFW_KEY_S:
-					cam.dir = CameraDirection.NULL; break;
-				case GLFW.GLFW_KEY_D:
-					cam.dir = CameraDirection.NULL; break;
-				case GLFW.GLFW_KEY_SPACE:
-					cam.dir = CameraDirection.NULL; break;
-				case GLFW.GLFW_KEY_LEFT_SHIFT:
-					cam.dir = CameraDirection.NULL; break;
-				}
-			}
+			
+			if (key == GLFW_KEY_ESCAPE && action == GLFW.GLFW_RELEASE)
+				GLFW.glfwSetWindowShouldClose(window.getWindow(), true);
+			
+			cam.processKeyboardInput(inputWindow, key, scancode, action, mods);
+			
 		};
 		
 		window.loop(render, update, input);
